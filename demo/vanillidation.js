@@ -95,19 +95,35 @@ Vanillidation = (function() {
   };
 
   Vanillidation.prototype.showFieldErrors = function(elem) {
-    var error, li, ul;
+    var created, error, li, ul;
     error = this.errors[elem.name];
     if (error) {
       elem.parentNode.classList.add('form-row--not-valid');
+      created = false;
       ul = elem.parentNode.getElementsByClassName('errorlist')[0];
       if (!ul) {
         ul = document.createElement('ul');
         ul.className = 'errorlist';
+        created = true;
+      } else {
+        while (ul.firstChild) {
+          ul.removeChild(ul.firstChild);
+        }
       }
       li = document.createElement('li');
       li.appendChild(document.createTextNode(error));
       ul.appendChild(li);
-      return elem.parentNode.appendChild(ul);
+      if (created) {
+        return elem.parentNode.appendChild(ul);
+      } else {
+        return ul.style.display = 'block';
+      }
+    } else {
+      elem.parentNode.classList.remove('form-row--not-valid');
+      ul = elem.parentNode.getElementsByClassName('errorlist')[0];
+      if (ul != null) {
+        return ul.style.display = 'none';
+      }
     }
   };
 

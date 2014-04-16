@@ -36,16 +36,27 @@ class Vanillidation
 
     if error
       elem.parentNode.classList.add 'form-row--not-valid'
+      created = false
       ul = elem.parentNode.getElementsByClassName('errorlist')[0]
       if not ul
         ul = document.createElement 'ul'
         ul.className = 'errorlist';
+        created = true
+      else
+        ul.removeChild ul.firstChild while ul.firstChild
 
       li = document.createElement 'li'
       li.appendChild document.createTextNode error
       ul.appendChild li
 
-      elem.parentNode.appendChild ul
+      if created
+        elem.parentNode.appendChild ul
+      else
+        ul.style.display = 'block'
+    else
+      elem.parentNode.classList.remove 'form-row--not-valid'
+      ul = elem.parentNode.getElementsByClassName('errorlist')[0]
+      ul.style.display = 'none' if ul?
 
   bindValidationEvents: (elem, handler) ->
     elem.addEventListener 'blur', -> handler @
