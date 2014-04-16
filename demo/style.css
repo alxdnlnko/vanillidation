@@ -34,8 +34,7 @@ form {
     font-size: 14px;
 }
 
-.form-row input[type="text"],
-.form-row input[type="password"],
+.form-row input:not([type="submit"]),
 .form-row select,
 .form-row textarea {
     display: block;
@@ -50,8 +49,7 @@ form {
     outline: none;
 }
 
-.form-row input[type="text"]:focus,
-.form-row input[type="password"]:focus,
+.form-row input:not([type="submit"]):focus,
 .form-row textarea:focus {
     border: 1px solid #555;
     background: #fff;
@@ -87,13 +85,14 @@ form > .errorlist {
 form > .errorlist li {
     list-style: none;
     text-align: center;
-    color: #d30f0f;
+    color: #c90000;
 }
 
-.form-row--not-valid input,
+.form-row--not-valid input:not([type="submit"]),
 .form-row--not-valid select,
 .form-row--not-valid textarea {
-    border: 1px solid #d30f0f;
+    border: 1px solid #dd1212;
+    background: #ffefef;
 }
 
 .form-row--not-valid .errorlist {
