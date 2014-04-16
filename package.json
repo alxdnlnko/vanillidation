@@ -1,0 +1,19 @@
+{
+  "name": "vanillidation",
+  "author": "Alex Danilenko <alxdnlnko@gmail.com>",
+  "version": "0.0.1",
+  "private": false,
+  "dependencies": {},
+  "devDependencies": {
+    "gulp": "^3.6.0",
+    "browserify": "^3.42.0",
+    "coffeeify": "^0.6.0",
+    "through2": "^0.4.1",
+    "gulp-rename": "^1.2.0",
+    "coffee-script": "^1.7.1",
+    "express": "^4.0.0",
+    "gulp-livereload": "^1.3.1",
+    "tiny-lr": "0.0.5",
+    "connect-livereload": "^0.4.0"
+  }
+}
