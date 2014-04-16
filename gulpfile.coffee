@@ -2,6 +2,8 @@ gulp = require 'gulp'
 rename = require 'gulp-rename'
 browserify = require 'browserify'
 coffeeify = require 'coffeeify'
+uglify = require 'gulp-uglify'
+streamify = require 'gulp-streamify'
 
 path = require 'path'
 through = require 'through2'
@@ -15,7 +17,7 @@ lrserver = tinylr()
 
 bundle = ->
   return through.obj (file, enc, cb) ->
-    b = browserify(file.path)
+    b = browserify {entries: file.path, extensions: ['.coffee']}
       .transform coffeeify
 
     file.contents = b.bundle()
@@ -24,9 +26,10 @@ bundle = ->
 
 
 gulp.task 'dev', ->
-  gulp.src ['src/index.coffee']
+  gulp.src ['src/index.js']
     .pipe bundle()
     .pipe rename 'vanillidation.js'
+    # .pipe streamify uglify()
     .pipe gulp.dest 'demo/'
     .pipe livereload lrserver
 
@@ -35,7 +38,6 @@ gulp.task 'server', ->
   app.use require('connect-livereload')()
   app.use express.static path.resolve './demo'
   app.listen 3000
-  console.log 'Listening on port 3000'
 
 
 gulp.task 'demo', ->
@@ -46,9 +48,8 @@ gulp.task 'demo', ->
 gulp.task 'watch', ->
   lrserver.listen 35729, (err) ->
     return console.log err if err
-  gulp.watch 'src/*.coffee', ['dev']
-  gulp.watch 'demo/*.html', ['demo']
-  gulp.watch 'demo/*.css', ['demo']
+  gulp.watch ['src/*.coffee', 'src/*.js'], ['dev']
+  gulp.watch ['demo/*.html', 'demo/*.css'], ['demo']
 
 
 gulp.task 'default', ['dev', 'demo', 'server', 'watch']

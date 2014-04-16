@@ -33,7 +33,14 @@
 
         <script src="vanillidation.js"></script>
         <script>
-            console.log('Init')
+            var v = new Vanillidation(document.getElementById('test_form'), {
+                rules: {
+                    first_name: {
+                        required: true
+                    },
+                    last_name: ['required']
+                }
+            });
         </script>
     </body>
 </html>
