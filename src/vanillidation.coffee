@@ -37,7 +37,13 @@ class Vanillidation
           break
     else
       for r, opts of rules
-        if not @validators[r]?(elem, opts)
+        valid = true
+        if typeof opts is 'function'
+          valid = opts(elem)
+        else
+          valid = @validators[r]?(elem, opts)
+
+        if not valid
           @errors[name] = (@messagesOR[name]?[r] ? @messages[r]) ? 'Invalid data.'
           break
 

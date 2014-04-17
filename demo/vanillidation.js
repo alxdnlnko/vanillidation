@@ -97,7 +97,7 @@ Vanillidation = (function() {
   };
 
   Vanillidation.prototype.validateField = function(elem) {
-    var name, opts, r, rules, _base, _base1, _i, _len, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6;
+    var name, opts, r, rules, valid, _base, _base1, _i, _len, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6;
     name = elem.name;
     rules = (_ref = this.rules) != null ? _ref[name] : void 0;
     if (rules == null) {
@@ -117,7 +117,13 @@ Vanillidation = (function() {
     } else {
       for (r in rules) {
         opts = rules[r];
-        if (!(typeof (_base1 = this.validators)[r] === "function" ? _base1[r](elem, opts) : void 0)) {
+        valid = true;
+        if (typeof opts === 'function') {
+          valid = opts(elem);
+        } else {
+          valid = typeof (_base1 = this.validators)[r] === "function" ? _base1[r](elem, opts) : void 0;
+        }
+        if (!valid) {
           this.errors[name] = (_ref4 = (_ref5 = (_ref6 = this.messagesOR[name]) != null ? _ref6[r] : void 0) != null ? _ref5 : this.messages[r]) != null ? _ref4 : 'Invalid data.';
           break;
         }

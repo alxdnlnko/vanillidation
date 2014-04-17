@@ -61,7 +61,14 @@
                     last_name: ['required'],
                     password: {
                         required: true,
-                        minLength: 6
+                        minLength: 6,
+                        goodPass: function(elem) {
+                            var sum = 0;
+                            if (/([a-z])/.exec(elem.value)) sum += 1;
+                            if (/([A-Z])/.exec(elem.value)) sum += 1;
+                            if (/([0-9!@#\$%\^\&*\)\(+=.,\/\\_\-\{\}\?;:~`\'"\[\]<>])/.exec(elem.value)) sum += 1;
+                            return sum > 1;
+                        }
                     },
                     email: ['required', 'email'],
                     heard_from: ['required'],
@@ -73,7 +80,8 @@
                         required: 'You must specify your name.'
                     },
                     password: {
-                        minLength: 'Password must be at least 6 characters long.'
+                        minLength: 'Password must be at least 6 characters long.',
+                        goodPass: 'Your password is too weak.'
                     }
                 }
             });
