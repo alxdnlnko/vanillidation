@@ -29,16 +29,20 @@ form {
 }
 
 .form-row label {
-    display: block;
     text-align: left;
     font-size: 14px;
+}
+
+.form-row input:not([type="checkbox"]),
+.form-row select,
+.form-row textarea {
+    display: block;
+    width: 100%;
 }
 
 .form-row input:not([type="submit"]),
 .form-row select,
 .form-row textarea {
-    display: block;
-    width: 100%;
     padding: 10px;
     font-size: 16px;
     background: #f5f5f5;

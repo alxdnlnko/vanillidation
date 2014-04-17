@@ -27,6 +27,26 @@
             </div>
 
             <div class="form-row">
+                <label for="id_heard_from">Heard from</label>
+                <select name="heard_from" id="id_heard_from">
+                    <option value="">Select a value</option>
+                    <option value="1">Twitter</option>
+                    <option value="2">Facebook</option>
+                    <option value="3">Google</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <label for="id_comments">Comments</label>
+                <textarea name="comments" id="id_comments" cols="30" rows="5"></textarea>
+            </div>
+
+            <div class="form-row">
+                <input type="checkbox" name="agree" id="id_agree">
+                <label for="id_agree">I'm agree with some statements</label>
+            </div>
+
+            <div class="form-row">
                 <input type="submit" value="Confirm" class="confirm-btn">
             </div>
         </form>
@@ -39,8 +59,22 @@
                         required: true
                     },
                     last_name: ['required'],
-                    password: ['required'],
-                    email: ['required', 'email']
+                    password: {
+                        required: true,
+                        minLength: 6
+                    },
+                    email: ['required', 'email'],
+                    heard_from: ['required'],
+                    comments: ['required'],
+                    agree: ['required']
+                },
+                messages: {
+                    first_name: {
+                        required: 'You must specify your name.'
+                    },
+                    password: {
+                        minLength: 'Password must be at least 6 characters long.'
+                    }
                 }
             });
         </script>

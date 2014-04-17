@@ -6,11 +6,23 @@ class Vanillidation
     @validators = require './validators'
     @messages = require './messages'
     @rules = opts?.rules ? {}
+    @messagesOR = opts?.messages ? {}  # messages override
     @errors = {}
 
-    fields = @form.querySelectorAll 'input:not([type="submit"]),select,textarea'
+    fields = @getFields()
     for elem in fields
       @bindValidationEvents elem, @validateField
+
+    @form.addEventListener 'submit', @validateForm
+
+  getFields: () =>
+    @form.querySelectorAll 'input:not([type="submit"]),select,textarea'
+
+  validateForm: (ev) =>
+    @validateField elem for elem in @getFields()
+    if (Object.keys @errors).length
+      ev.preventDefault()
+      return false
 
   validateField: (elem) =>
     name = elem.name
@@ -21,12 +33,12 @@ class Vanillidation
     if utils.isArray rules
       for r in rules
         if not @validators[r]?(elem)
-          @errors[name] = @messages[r] ? 'Invalid data.'
+          @errors[name] = (@messagesOR[name]?[r] ? @messages[r]) ? 'Invalid data.'
           break
     else
       for r, opts of rules
-        if not @validators[r]?(elem)
-          @errors[name] = @messages[r] ? 'Invalid data.'
+        if not @validators[r]?(elem, opts)
+          @errors[name] = (@messagesOR[name]?[r] ? @messages[r]) ? 'Invalid data.'
           break
 
     @showFieldErrors elem
@@ -59,11 +71,15 @@ class Vanillidation
       ul.style.display = 'none' if ul?
 
   bindValidationEvents: (elem, handler) ->
-    elem.addEventListener 'blur', -> handler @
+    if not (elem.tagName is 'INPUT' and elem.type is 'checkbox')
+      elem.addEventListener 'blur', -> handler @
 
     self = @
-    elem.addEventListener 'keyup', ->
+    conditionalValidation = ->
       handler @ if @.name of self.errors
+
+    elem.addEventListener 'keyup', conditionalValidation
+    elem.addEventListener 'change', conditionalValidation
 
 
 module.exports = Vanillidation

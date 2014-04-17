@@ -13,7 +13,8 @@
 module.exports = {
   required: 'This field is required.',
   regex: 'The value doesn\'t match the format.',
-  email: 'Enter a valid e-mail address.'
+  email: 'Enter a valid e-mail address.',
+  minLength: 'The value is too short.'
 };
 
 
@@ -30,13 +31,23 @@ var fn;
 
 module.exports = fn = {
   required: function(elem) {
-    return (elem.value != null) && elem.value !== '';
+    if (elem.tagName === 'INPUT' && elem.type === 'checkbox') {
+      return elem.checked;
+    } else {
+      return (elem.value != null) && elem.value !== '';
+    }
   },
   regex: function(elem, expr) {
     return expr.test(elem.value);
   },
   email: function(elem) {
     return fn.regex(elem, /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
+  },
+  minLength: function(elem, len) {
+    if (elem.tagName === 'INPUT' && elem.type === 'checkbox' || elem.tagName === 'SELECT') {
+      return true;
+    }
+    return (elem.value != null) && elem.value.length >= len;
   }
 };
 
@@ -49,23 +60,44 @@ utils = require('./utils');
 
 Vanillidation = (function() {
   function Vanillidation(form, opts) {
-    var elem, fields, _i, _len, _ref;
+    var elem, fields, _i, _len, _ref, _ref1;
     this.form = form;
     this.showFieldErrors = __bind(this.showFieldErrors, this);
     this.validateField = __bind(this.validateField, this);
+    this.validateForm = __bind(this.validateForm, this);
+    this.getFields = __bind(this.getFields, this);
     this.validators = require('./validators');
     this.messages = require('./messages');
     this.rules = (_ref = opts != null ? opts.rules : void 0) != null ? _ref : {};
+    this.messagesOR = (_ref1 = opts != null ? opts.messages : void 0) != null ? _ref1 : {};
     this.errors = {};
-    fields = this.form.querySelectorAll('input:not([type="submit"]),select,textarea');
+    fields = this.getFields();
     for (_i = 0, _len = fields.length; _i < _len; _i++) {
       elem = fields[_i];
       this.bindValidationEvents(elem, this.validateField);
     }
+    this.form.addEventListener('submit', this.validateForm);
   }
 
+  Vanillidation.prototype.getFields = function() {
+    return this.form.querySelectorAll('input:not([type="submit"]),select,textarea');
+  };
+
+  Vanillidation.prototype.validateForm = function(ev) {
+    var elem, _i, _len, _ref;
+    _ref = this.getFields();
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      elem = _ref[_i];
+      this.validateField(elem);
+    }
+    if ((Object.keys(this.errors)).length) {
+      ev.preventDefault();
+      return false;
+    }
+  };
+
   Vanillidation.prototype.validateField = function(elem) {
-    var name, opts, r, rules, _base, _base1, _i, _len, _ref, _ref1, _ref2;
+    var name, opts, r, rules, _base, _base1, _i, _len, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6;
     name = elem.name;
     rules = (_ref = this.rules) != null ? _ref[name] : void 0;
     if (rules == null) {
@@ -78,15 +110,15 @@ Vanillidation = (function() {
       for (_i = 0, _len = rules.length; _i < _len; _i++) {
         r = rules[_i];
         if (!(typeof (_base = this.validators)[r] === "function" ? _base[r](elem) : void 0)) {
-          this.errors[name] = (_ref1 = this.messages[r]) != null ? _ref1 : 'Invalid data.';
+          this.errors[name] = (_ref1 = (_ref2 = (_ref3 = this.messagesOR[name]) != null ? _ref3[r] : void 0) != null ? _ref2 : this.messages[r]) != null ? _ref1 : 'Invalid data.';
           break;
         }
       }
     } else {
       for (r in rules) {
         opts = rules[r];
-        if (!(typeof (_base1 = this.validators)[r] === "function" ? _base1[r](elem) : void 0)) {
-          this.errors[name] = (_ref2 = this.messages[r]) != null ? _ref2 : 'Invalid data.';
+        if (!(typeof (_base1 = this.validators)[r] === "function" ? _base1[r](elem, opts) : void 0)) {
+          this.errors[name] = (_ref4 = (_ref5 = (_ref6 = this.messagesOR[name]) != null ? _ref6[r] : void 0) != null ? _ref5 : this.messages[r]) != null ? _ref4 : 'Invalid data.';
           break;
         }
       }
@@ -128,16 +160,20 @@ Vanillidation = (function() {
   };
 
   Vanillidation.prototype.bindValidationEvents = function(elem, handler) {
-    var self;
-    elem.addEventListener('blur', function() {
-      return handler(this);
-    });
+    var conditionalValidation, self;
+    if (!(elem.tagName === 'INPUT' && elem.type === 'checkbox')) {
+      elem.addEventListener('blur', function() {
+        return handler(this);
+      });
+    }
     self = this;
-    return elem.addEventListener('keyup', function() {
+    conditionalValidation = function() {
       if (this.name in self.errors) {
         return handler(this);
       }
-    });
+    };
+    elem.addEventListener('keyup', conditionalValidation);
+    return elem.addEventListener('change', conditionalValidation);
   };
 
   return Vanillidation;
