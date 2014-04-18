@@ -1,7 +1,7 @@
 Vanilla Validation
 ==================
 
-Vanilla form validation without any dependences
+Vanilla form validation without any dependencies
 
 Browsers compatibility
 -------------------
@@ -14,7 +14,7 @@ Plans
 -----
 
 - porting of `jquery.validation` validators
-- extend browsers compatibility
+- better browsers compatibility
 - enhancements
 
 Contribution
