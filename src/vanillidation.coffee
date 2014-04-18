@@ -26,10 +26,38 @@ class Vanillidation
     @form.querySelectorAll 'input:not([type="submit"]),select,textarea'
 
   validateForm: (ev) =>
+    delete @errors['__form__'] if '__form__' of @errors
     @validateField elem for elem in @getFields()
     if (Object.keys @errors).length
+      console.log 'asdfasdf'
+      @errors['__form__'] = @messagesOR['__form__'] ? @messages['__form__']
+      @showFormErrors()
       ev.preventDefault()
       return false
+
+  showFormErrors: () =>
+    error = @errors['__form__']
+    if error
+      created = false
+      ul = @form.getElementsByClassName('form-errors')[0]
+      if not ul
+        ul = document.createElement 'ul'
+        ul.className = @settings.errorListClass + ' form-errors'
+        created = true
+      else
+        ul.removeChild ul.firstChild while ul.firstChild
+
+      li = document.createElement 'li'
+      li.appendChild document.createTextNode error
+      ul.appendChild li
+
+      if created
+        @form.insertBefore ul, @form.firstChild
+      else
+        ul.style.display = 'block'
+    else
+      ul = @form.getElementsByClassName('form-errors')[0]
+      ul.style.display = 'none' if ul?
 
   validateField: (elem) =>
     name = elem.name

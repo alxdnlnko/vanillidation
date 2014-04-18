@@ -11,6 +11,7 @@
 
 },{"./vanillidation":5}],2:[function(require,module,exports){
 module.exports = {
+  __form__: 'Please, correct the errors below.',
   required: 'This field is required.',
   regex: 'The value doesn\'t match the format.',
   email: 'Enter a valid e-mail address.',
@@ -92,6 +93,7 @@ Vanillidation = (function() {
     this.form = form;
     this.showFieldErrors = __bind(this.showFieldErrors, this);
     this.validateField = __bind(this.validateField, this);
+    this.showFormErrors = __bind(this.showFormErrors, this);
     this.validateForm = __bind(this.validateForm, this);
     this.getFields = __bind(this.getFields, this);
     this.validators = require('./validators');
@@ -118,15 +120,52 @@ Vanillidation = (function() {
   };
 
   Vanillidation.prototype.validateForm = function(ev) {
-    var elem, _i, _len, _ref;
+    var elem, _i, _len, _ref, _ref1;
+    if ('__form__' in this.errors) {
+      delete this.errors['__form__'];
+    }
     _ref = this.getFields();
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       elem = _ref[_i];
       this.validateField(elem);
     }
     if ((Object.keys(this.errors)).length) {
+      console.log('asdfasdf');
+      this.errors['__form__'] = (_ref1 = this.messagesOR['__form__']) != null ? _ref1 : this.messages['__form__'];
+      this.showFormErrors();
       ev.preventDefault();
       return false;
+    }
+  };
+
+  Vanillidation.prototype.showFormErrors = function() {
+    var created, error, li, ul;
+    error = this.errors['__form__'];
+    if (error) {
+      created = false;
+      ul = this.form.getElementsByClassName('form-errors')[0];
+      if (!ul) {
+        ul = document.createElement('ul');
+        ul.className = this.settings.errorListClass + ' form-errors';
+        created = true;
+      } else {
+        while (ul.firstChild) {
+          ul.removeChild(ul.firstChild);
+        }
+      }
+      li = document.createElement('li');
+      li.appendChild(document.createTextNode(error));
+      ul.appendChild(li);
+      if (created) {
+        return this.form.insertBefore(ul, this.form.firstChild);
+      } else {
+        return ul.style.display = 'block';
+      }
+    } else {
+      ul = this.form.getElementsByClassName('form-errors')[0];
+      if (ul != null) {
+        return ul.style.display = 'none';
+      }
     }
   };
 
