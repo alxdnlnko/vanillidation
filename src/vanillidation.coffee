@@ -9,6 +9,13 @@ class Vanillidation
     @messagesOR = opts?.messages ? {}  # messages override
     @errors = {}
 
+    defaults =
+      errorClass: 'has-error'
+      classToParent: false
+      errorListClass: 'errorlist'
+
+    @settings = utils.override defaults, opts ? {}
+
     fields = @getFields()
     for elem in fields
       @bindValidationEvents elem, @validateField
@@ -37,11 +44,7 @@ class Vanillidation
           break
     else
       for r, opts of rules
-        valid = true
-        if typeof opts is 'function'
-          valid = opts(elem)
-        else
-          valid = @validators[r]?(elem, opts)
+        valid = if typeof opts is 'function' then opts(elem) else @validators[r]?(elem, opts)
 
         if not valid
           @errors[name] = (@messagesOR[name]?[r] ? @messages[r]) ? 'Invalid data.'
@@ -53,12 +56,12 @@ class Vanillidation
     error = @errors[elem.name]
 
     if error
-      elem.parentNode.classList.add 'form-row--not-valid'
+      (if @settings.classToParent then elem.parentNode else elem).classList.add @settings.errorClass
       created = false
-      ul = elem.parentNode.getElementsByClassName('errorlist')[0]
+      ul = elem.parentNode.getElementsByClassName(@settings.errorListClass)[0]
       if not ul
         ul = document.createElement 'ul'
-        ul.className = 'errorlist';
+        ul.className = @settings.errorListClass
         created = true
       else
         ul.removeChild ul.firstChild while ul.firstChild
@@ -72,8 +75,8 @@ class Vanillidation
       else
         ul.style.display = 'block'
     else
-      elem.parentNode.classList.remove 'form-row--not-valid'
-      ul = elem.parentNode.getElementsByClassName('errorlist')[0]
+      (if @settings.classToParent then elem.parentNode else elem).classList.remove @settings.errorClass
+      ul = elem.parentNode.getElementsByClassName(@settings.errorListClass)[0]
       ul.style.display = 'none' if ul?
 
   bindValidationEvents: (elem, handler) ->

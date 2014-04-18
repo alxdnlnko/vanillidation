@@ -19,9 +19,37 @@ module.exports = {
 
 
 },{}],3:[function(require,module,exports){
+var __slice = [].slice;
+
 module.exports = {
   isArray: function(o) {
     return (Object.prototype.toString.call(o)) === '[object Array]';
+  },
+  extend: function() {
+    var key, obj, objects, target, value, _i, _len;
+    target = arguments[0], objects = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+    for (_i = 0, _len = objects.length; _i < _len; _i++) {
+      obj = objects[_i];
+      for (key in obj) {
+        value = obj[key];
+        target[key] = value;
+      }
+    }
+    return target;
+  },
+  override: function() {
+    var key, obj, objects, target, value, _i, _len;
+    target = arguments[0], objects = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+    for (_i = 0, _len = objects.length; _i < _len; _i++) {
+      obj = objects[_i];
+      for (key in obj) {
+        value = obj[key];
+        if (key in target) {
+          target[key] = value;
+        }
+      }
+    }
+    return target;
   }
 };
 
@@ -60,7 +88,7 @@ utils = require('./utils');
 
 Vanillidation = (function() {
   function Vanillidation(form, opts) {
-    var elem, fields, _i, _len, _ref, _ref1;
+    var defaults, elem, fields, _i, _len, _ref, _ref1;
     this.form = form;
     this.showFieldErrors = __bind(this.showFieldErrors, this);
     this.validateField = __bind(this.validateField, this);
@@ -71,6 +99,12 @@ Vanillidation = (function() {
     this.rules = (_ref = opts != null ? opts.rules : void 0) != null ? _ref : {};
     this.messagesOR = (_ref1 = opts != null ? opts.messages : void 0) != null ? _ref1 : {};
     this.errors = {};
+    defaults = {
+      errorClass: 'has-error',
+      classToParent: false,
+      errorListClass: 'errorlist'
+    };
+    this.settings = utils.override(defaults, opts != null ? opts : {});
     fields = this.getFields();
     for (_i = 0, _len = fields.length; _i < _len; _i++) {
       elem = fields[_i];
@@ -117,12 +151,7 @@ Vanillidation = (function() {
     } else {
       for (r in rules) {
         opts = rules[r];
-        valid = true;
-        if (typeof opts === 'function') {
-          valid = opts(elem);
-        } else {
-          valid = typeof (_base1 = this.validators)[r] === "function" ? _base1[r](elem, opts) : void 0;
-        }
+        valid = typeof opts === 'function' ? opts(elem) : typeof (_base1 = this.validators)[r] === "function" ? _base1[r](elem, opts) : void 0;
         if (!valid) {
           this.errors[name] = (_ref4 = (_ref5 = (_ref6 = this.messagesOR[name]) != null ? _ref6[r] : void 0) != null ? _ref5 : this.messages[r]) != null ? _ref4 : 'Invalid data.';
           break;
@@ -136,12 +165,12 @@ Vanillidation = (function() {
     var created, error, li, ul;
     error = this.errors[elem.name];
     if (error) {
-      elem.parentNode.classList.add('form-row--not-valid');
+      (this.settings.classToParent ? elem.parentNode : elem).classList.add(this.settings.errorClass);
       created = false;
-      ul = elem.parentNode.getElementsByClassName('errorlist')[0];
+      ul = elem.parentNode.getElementsByClassName(this.settings.errorListClass)[0];
       if (!ul) {
         ul = document.createElement('ul');
-        ul.className = 'errorlist';
+        ul.className = this.settings.errorListClass;
         created = true;
       } else {
         while (ul.firstChild) {
@@ -157,8 +186,8 @@ Vanillidation = (function() {
         return ul.style.display = 'block';
       }
     } else {
-      elem.parentNode.classList.remove('form-row--not-valid');
-      ul = elem.parentNode.getElementsByClassName('errorlist')[0];
+      (this.settings.classToParent ? elem.parentNode : elem).classList.remove(this.settings.errorClass);
+      ul = elem.parentNode.getElementsByClassName(this.settings.errorListClass)[0];
       if (ul != null) {
         return ul.style.display = 'none';
       }
