@@ -119,6 +119,7 @@ Vanillidation = (function() {
       elem = fields[_i];
       this.bindValidationEvents(elem, this.validateField);
     }
+    this.form.setAttribute('novalidate', 'novalidate');
     this.form.addEventListener('submit', this.validateForm);
   }
 
@@ -137,7 +138,6 @@ Vanillidation = (function() {
       this.validateField(elem);
     }
     if ((Object.keys(this.errors)).length) {
-      console.log('asdfasdf');
       this.errors['__form__'] = (_ref1 = this.messagesOR['__form__']) != null ? _ref1 : this.messages['__form__'];
       this.showFormErrors();
       ev.preventDefault();

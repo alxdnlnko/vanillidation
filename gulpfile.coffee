@@ -29,9 +29,16 @@ gulp.task 'dev', ->
   gulp.src ['src/index.js']
     .pipe bundle()
     .pipe rename 'vanillidation.js'
-    # .pipe streamify uglify()
     .pipe gulp.dest 'demo/'
     .pipe livereload lrserver
+
+
+gulp.task 'build', ->
+  gulp.src ['src/index.js']
+    .pipe bundle()
+    .pipe rename 'vanillidation.min.js'
+    .pipe streamify uglify()
+    .pipe gulp.dest 'build/'
 
 
 gulp.task 'server', ->

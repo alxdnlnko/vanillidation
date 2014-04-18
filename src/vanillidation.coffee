@@ -20,6 +20,7 @@ class Vanillidation
     for elem in fields
       @bindValidationEvents elem, @validateField
 
+    @form.setAttribute 'novalidate', 'novalidate'
     @form.addEventListener 'submit', @validateForm
 
   getFields: () =>
@@ -29,7 +30,6 @@ class Vanillidation
     delete @errors['__form__'] if '__form__' of @errors
     @validateField elem for elem in @getFields()
     if (Object.keys @errors).length
-      console.log 'asdfasdf'
       @errors['__form__'] = @messagesOR['__form__'] ? @messages['__form__']
       @showFormErrors()
       ev.preventDefault()
