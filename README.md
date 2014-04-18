@@ -3,6 +3,19 @@ Vanilla Validation
 
 Vanilla form validation without any dependences
 
+Browsers compatibility
+-------------------
+
+- `document.getElementsByClassName`: Chrome, Firefox 3+, IE 9+, Opera, Safari
+- `document.querySelectorAll`: Chrome 1+, Firefox 3.5+, IE 8+, Opera 10+, Safari 3.2+
+- **summary**: Chrome 1+, Firefox 3.5+, IE 9+, Opera 10+, Safari 3.2+
+
+Plans
+-----
+
+- porting of `jquery.validation` validators
+- extend browsers compatibility
+- enhancements
 
 Contribution
 ------------
