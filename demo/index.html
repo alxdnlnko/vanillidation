@@ -56,9 +56,10 @@
             var v = new Vanillidation(document.getElementById('test_form'), {
                 rules: {
                     first_name: {
-                        required: true
+                        required: true,
+                        isASCII: true
                     },
-                    last_name: ['required'],
+                    last_name: ['required', 'isASCII'],
                     password: {
                         required: true,
                         minLength: 6,
@@ -87,7 +88,10 @@
                 },
                 errorClass: 'form-row--not-valid',
                 classToParent: true,
-                errorListClass: 'errorlist'
+                errorListClass: 'errorlist',
+                conditional: {
+                    last_name: 'first_name'
+                }
             });
         </script>
     </body>

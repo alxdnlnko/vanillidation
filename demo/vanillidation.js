@@ -22,7 +22,9 @@ module.exports = {
   required: 'This field is required.',
   regex: 'The value doesn\'t match the format.',
   email: 'Enter a valid e-mail address.',
-  minLength: 'The value is too short.'
+  minLength: 'The value is too short.',
+  digits: 'This field can contain digits only.',
+  isASCII: 'Please, don\'t use non-latin letters.'
 };
 
 
@@ -84,6 +86,12 @@ module.exports = fn = {
       return true;
     }
     return (elem.value != null) && elem.value.length >= len;
+  },
+  digits: function(elem) {
+    return fn.regex(elem, /^\d+$/);
+  },
+  isASCII: function(elem) {
+    return /^[\x00-\x7F]*$/.test(elem.value);
   }
 };
 
@@ -111,7 +119,8 @@ Vanillidation = (function() {
     defaults = {
       errorClass: 'has-error',
       classToParent: false,
-      errorListClass: 'errorlist'
+      errorListClass: 'errorlist',
+      conditional: {}
     };
     this.settings = utils.override(defaults, opts != null ? opts : {});
     fields = this.getFields();
@@ -177,11 +186,20 @@ Vanillidation = (function() {
   };
 
   Vanillidation.prototype.validateField = function(elem) {
-    var name, opts, r, rules, valid, _base, _base1, _i, _len, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6;
+    var condition, name, opts, r, rules, valid, _base, _base1, _i, _len, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7;
     name = elem.name;
     rules = (_ref = this.rules) != null ? _ref[name] : void 0;
     if (rules == null) {
       return;
+    }
+    if ((condition = (_ref1 = this.settings.conditional) != null ? _ref1[name] : void 0) != null) {
+      if (typeof condition === 'function' && !condition() || this.errors[condition]) {
+        if (name in this.errors) {
+          delete this.errors[name];
+        }
+        this.showFieldErrors(elem);
+        return true;
+      }
     }
     if (name in this.errors) {
       delete this.errors[name];
@@ -190,7 +208,7 @@ Vanillidation = (function() {
       for (_i = 0, _len = rules.length; _i < _len; _i++) {
         r = rules[_i];
         if (!(typeof (_base = this.validators)[r] === "function" ? _base[r](elem) : void 0)) {
-          this.errors[name] = (_ref1 = (_ref2 = (_ref3 = this.messagesOR[name]) != null ? _ref3[r] : void 0) != null ? _ref2 : this.messages[r]) != null ? _ref1 : 'Invalid data.';
+          this.errors[name] = (_ref2 = (_ref3 = (_ref4 = this.messagesOR[name]) != null ? _ref4[r] : void 0) != null ? _ref3 : this.messages[r]) != null ? _ref2 : 'Invalid data.';
           break;
         }
       }
@@ -199,7 +217,7 @@ Vanillidation = (function() {
         opts = rules[r];
         valid = typeof opts === 'function' ? opts(elem) : typeof (_base1 = this.validators)[r] === "function" ? _base1[r](elem, opts) : void 0;
         if (!valid) {
-          this.errors[name] = (_ref4 = (_ref5 = (_ref6 = this.messagesOR[name]) != null ? _ref6[r] : void 0) != null ? _ref5 : this.messages[r]) != null ? _ref4 : 'Invalid data.';
+          this.errors[name] = (_ref5 = (_ref6 = (_ref7 = this.messagesOR[name]) != null ? _ref7[r] : void 0) != null ? _ref6 : this.messages[r]) != null ? _ref5 : 'Invalid data.';
           break;
         }
       }

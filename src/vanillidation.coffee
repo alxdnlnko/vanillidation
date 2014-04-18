@@ -13,6 +13,7 @@ class Vanillidation
       errorClass: 'has-error'
       classToParent: false
       errorListClass: 'errorlist'
+      conditional: {}
 
     @settings = utils.override defaults, opts ? {}
 
@@ -63,6 +64,12 @@ class Vanillidation
     name = elem.name
     rules = @rules?[name]
     return if not rules?
+
+    if (condition = @settings.conditional?[name])?
+      if typeof condition is 'function' and not condition() or @errors[condition]
+        delete @errors[name] if name of @errors
+        @showFieldErrors elem
+        return true
 
     delete @errors[name] if name of @errors
     if utils.isArray rules
