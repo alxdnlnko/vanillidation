@@ -90,7 +90,9 @@
                 classToParent: true,
                 errorListClass: 'errorlist',
                 conditional: {
-                    last_name: 'first_name'
+                    last_name: function() {
+                        return document.getElementById('id_first_name').value.length > 0;
+                    }
                 }
             });
         </script>
