@@ -27,13 +27,28 @@
             </div>
 
             <div class="form-row">
-                <label for="id_heard_from">Heard from</label>
+                <label for="id_heard_from">Credit Card Type</label>
                 <select name="heard_from" id="id_heard_from">
                     <option value="">Select a value</option>
                     <option value="1">Twitter</option>
                     <option value="2">Facebook</option>
                     <option value="3">Google</option>
                 </select>
+            </div>
+
+            <div class="form-row">
+                <label for="id_cc_type">Heard from</label>
+                <select name="cc_type" id="id_cc_type">
+                    <option value="visa">Visa</option>
+                    <option value="mastercard">Master Card</option>
+                    <option value="amex">American Express</option>
+                    <option value="discover">Discover</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <label for="id_credit_card">Credit Card</label>
+                <input type="text" name="credit_card" id="id_credit_card">
             </div>
 
             <div class="form-row">
@@ -73,6 +88,10 @@
                     },
                     email: ['required', 'email'],
                     heard_from: ['required'],
+                    credit_card: {
+                        required: true,
+                        creditCard: document.getElementById('id_cc_type')
+                    },
                     comments: ['required'],
                     agree: ['required']
                 },

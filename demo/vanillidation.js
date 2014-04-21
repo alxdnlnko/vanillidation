@@ -24,7 +24,8 @@ module.exports = {
   email: 'Enter a valid e-mail address.',
   minLength: 'The value is too short.',
   digits: 'This field can contain digits only.',
-  isASCII: 'Please, don\'t use non-latin letters.'
+  isASCII: 'Please, don\'t use non-latin letters.',
+  creditCard: 'Invalid credit card number.'
 };
 
 
@@ -92,6 +93,47 @@ module.exports = fn = {
   },
   isASCII: function(elem) {
     return /^[\x00-\x7F]*$/.test(elem.value);
+  },
+  creditCard: function(elem, typeElem) {
+    var checkType, i, n, total, type, val, _i, _ref;
+    checkType = false;
+    if (typeElem && (type = typeElem.value)) {
+      type = type.toLowerCase();
+      checkType = true;
+    }
+    val = elem.value;
+    if (val == null) {
+      return false;
+    }
+    val = val.replace(/[- ]/g, '');
+    if (!/^\d+$/.test(val)) {
+      return false;
+    }
+    total = 0;
+    for (i = _i = _ref = val.length - 1; _ref <= 0 ? _i <= 0 : _i >= 0; i = _ref <= 0 ? ++_i : --_i) {
+      n = +val[i];
+      if ((i + val.length) % 2 === 0) {
+        n = n * 2 > 9 ? n * 2 - 9 : n * 2;
+      }
+      total += n;
+    }
+    if (total % 10 !== 0) {
+      return false;
+    }
+    if (!checkType) {
+      return true;
+    }
+    if (type === 'mastercard') {
+      return /^5[1-5].{14}$/.test(val);
+    } else if (type === 'visa') {
+      return /^4.{15}$|^4.{12}$/.test(val);
+    } else if (type === 'amex') {
+      return /^3[47].{13}$/.test(val);
+    } else if (type === 'discover') {
+      return /^6011.{12}$/.test(val);
+    } else {
+      return false;
+    }
   }
 };
 

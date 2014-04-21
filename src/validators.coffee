@@ -22,3 +22,35 @@ module.exports = fn =
 
   isASCII: (elem) ->
     return /^[\x00-\x7F]*$/.test elem.value
+
+  creditCard: (elem, typeElem) ->
+    checkType = false
+    if typeElem and (type = typeElem.value)
+      type = type.toLowerCase()
+      checkType = true
+
+    val = elem.value
+    return false if not val?
+
+    val = val.replace /[- ]/g, ''
+    return false if not /^\d+$/.test val
+
+    total = 0
+    for i in [(val.length - 1)..0]
+      n = +val[i]
+      if (i + val.length) % 2 == 0
+        n = if n * 2 > 9 then n * 2 - 9 else n * 2
+      total += n
+    return false if total % 10 != 0
+
+    return true if not checkType
+    if type is 'mastercard'
+      /^5[1-5].{14}$/.test val
+    else if type is 'visa'
+      /^4.{15}$|^4.{12}$/.test val
+    else if type is 'amex'
+      /^3[47].{13}$/.test val
+    else if type is 'discover'
+      /^6011.{12}$/.test val
+    else
+      false

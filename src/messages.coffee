@@ -6,3 +6,4 @@ module.exports =
   minLength: 'The value is too short.'
   digits: 'This field can contain digits only.'
   isASCII: 'Please, don\'t use non-latin letters.'
+  creditCard: 'Invalid credit card number.'
