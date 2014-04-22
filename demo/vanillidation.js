@@ -146,7 +146,7 @@ utils = require('./utils');
 
 Vanillidation = (function() {
   function Vanillidation(form, opts) {
-    var defaults, elem, fields, _i, _len, _ref, _ref1;
+    var defaults, elem, f, name, _i, _len, _ref, _ref1, _ref2, _ref3;
     this.form = form;
     this.showFieldErrors = __bind(this.showFieldErrors, this);
     this.validateField = __bind(this.validateField, this);
@@ -162,13 +162,20 @@ Vanillidation = (function() {
       errorClass: 'has-error',
       classToParent: false,
       errorListClass: 'errorlist',
-      conditional: {}
+      conditional: {},
+      dependencies: {}
     };
     this.settings = utils.override(defaults, opts != null ? opts : {});
-    fields = this.getFields();
-    for (_i = 0, _len = fields.length; _i < _len; _i++) {
-      elem = fields[_i];
-      this.bindValidationEvents(elem, this.validateField);
+    this.fields = {};
+    _ref2 = this.getFields();
+    for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
+      f = _ref2[_i];
+      this.fields[f.name] = f;
+    }
+    _ref3 = this.fields;
+    for (name in _ref3) {
+      elem = _ref3[name];
+      this.bindValidationEvents(name, elem, this.validateField);
     }
     this.form.setAttribute('novalidate', 'novalidate');
     this.form.addEventListener('submit', this.validateForm);
@@ -179,13 +186,13 @@ Vanillidation = (function() {
   };
 
   Vanillidation.prototype.validateForm = function(ev) {
-    var elem, _i, _len, _ref, _ref1;
+    var elem, name, _ref, _ref1;
     if ('__form__' in this.errors) {
       delete this.errors['__form__'];
     }
-    _ref = this.getFields();
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      elem = _ref[_i];
+    _ref = this.fields;
+    for (name in _ref) {
+      elem = _ref[name];
       this.validateField(elem);
     }
     if ((Object.keys(this.errors)).length) {
@@ -300,8 +307,8 @@ Vanillidation = (function() {
     }
   };
 
-  Vanillidation.prototype.bindValidationEvents = function(elem, handler) {
-    var conditionalValidation, self;
+  Vanillidation.prototype.bindValidationEvents = function(name, elem, handler) {
+    var conditionalValidation, dep, depElem, self, _i, _len, _ref, _results;
     if (!(elem.tagName === 'INPUT' && elem.type === 'checkbox')) {
       elem.addEventListener('blur', function() {
         return handler(this);
@@ -314,7 +321,19 @@ Vanillidation = (function() {
       }
     };
     elem.addEventListener('keyup', conditionalValidation);
-    return elem.addEventListener('change', conditionalValidation);
+    elem.addEventListener('change', conditionalValidation);
+    if (name in this.settings.dependencies) {
+      _ref = this.settings.dependencies[name];
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        dep = _ref[_i];
+        depElem = this.fields[dep];
+        _results.push(depElem.addEventListener('change', function() {
+          return handler(elem);
+        }));
+      }
+      return _results;
+    }
   };
 
   return Vanillidation;

@@ -14,12 +14,14 @@ class Vanillidation
       classToParent: false
       errorListClass: 'errorlist'
       conditional: {}
+      dependencies: {}
 
     @settings = utils.override defaults, opts ? {}
 
-    fields = @getFields()
-    for elem in fields
-      @bindValidationEvents elem, @validateField
+    @fields = {}
+    @fields[f.name] = f for f in @getFields()
+
+    @bindValidationEvents name, elem, @validateField for name, elem of @fields
 
     @form.setAttribute 'novalidate', 'novalidate'
     @form.addEventListener 'submit', @validateForm
@@ -29,7 +31,7 @@ class Vanillidation
 
   validateForm: (ev) =>
     delete @errors['__form__'] if '__form__' of @errors
-    @validateField elem for elem in @getFields()
+    @validateField elem for name, elem of @fields
     if (Object.keys @errors).length
       @errors['__form__'] = @messagesOR['__form__'] ? @messages['__form__']
       @showFormErrors()
@@ -114,16 +116,31 @@ class Vanillidation
       ul = elem.parentNode.getElementsByClassName(@settings.errorListClass)[0]
       ul.style.display = 'none' if ul?
 
-  bindValidationEvents: (elem, handler) ->
+  bindValidationEvents: (name, elem, handler) ->
     if not (elem.tagName is 'INPUT' and elem.type is 'checkbox')
       elem.addEventListener 'blur', -> handler @
 
     self = @
     conditionalValidation = ->
+      # only if invalid now
       handler @ if @.name of self.errors
 
     elem.addEventListener 'keyup', conditionalValidation
     elem.addEventListener 'change', conditionalValidation
+
+    if name of @settings.dependencies
+      for dep in @settings.dependencies[name]
+        depElem = @fields[dep]
+        depElem.addEventListener 'change', ->
+          handler elem
+
+          # if document.createEvent?
+          #   ev = document.createEvent 'HTMLEvents'
+          #   ev.initEvent 'change', false, true
+          #   elem.dispatchEvent ev
+          # else if document.createEventObject?
+          #   ev = document.createEventObject()
+          #   elem.fireEvent 'onchange', ev
 
 
 module.exports = Vanillidation

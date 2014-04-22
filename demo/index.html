@@ -112,6 +112,9 @@
                     last_name: function() {
                         return document.getElementById('id_first_name').value.length > 0;
                     }
+                },
+                dependencies: {
+                    credit_card: ['cc_type']
                 }
             });
         </script>
