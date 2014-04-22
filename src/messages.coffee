@@ -7,3 +7,4 @@ module.exports =
   digits: 'This field can contain digits only.'
   isASCII: 'Please, don\'t use non-latin letters.'
   creditCard: 'Invalid credit card number.'
+  creditCardExpireDate: 'Invalid expiration date.'

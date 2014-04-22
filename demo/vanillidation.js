@@ -134,6 +134,15 @@ module.exports = fn = {
     } else {
       return false;
     }
+  },
+  creditCardExpireDate: function(elem) {
+    var month, now, year, _ref;
+    if (!fn.regex(elem, /\d{2}\/\d{4}/)) {
+      return false;
+    }
+    _ref = elem.value.split('/'), month = _ref[0], year = _ref[1];
+    now = new Date();
+    return now.getFullYear() >= year && now.getMonth() > month;
   }
 };
 

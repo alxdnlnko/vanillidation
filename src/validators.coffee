@@ -54,3 +54,11 @@ module.exports = fn =
       /^6011.{12}$/.test val
     else
       false
+
+  creditCardExpireDate: (elem) ->
+    return false if not fn.regex elem, /\d{2}\/\d{4}/
+    [month, year] = elem.value.split('/')
+
+    now = new Date()
+    return now.getFullYear() < +year and 1 <= +month <= 12 or
+      now.getFullYear() == +year and now.getMonth() + 1 < +month <= 12
