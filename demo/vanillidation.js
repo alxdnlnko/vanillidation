@@ -25,7 +25,8 @@ module.exports = {
   minLength: 'The value is too short.',
   digits: 'This field can contain digits only.',
   isASCII: 'Please, don\'t use non-latin letters.',
-  creditCard: 'Invalid credit card number.'
+  creditCard: 'Invalid credit card number.',
+  creditCardExpireDate: 'Invalid expiration date.'
 };
 
 
@@ -142,7 +143,7 @@ module.exports = fn = {
     }
     _ref = elem.value.split('/'), month = _ref[0], year = _ref[1];
     now = new Date();
-    return now.getFullYear() >= year && now.getMonth() > month;
+    return now.getFullYear() < +year && (1 <= +month && +month <= 12) || now.getFullYear() === +year && (now.getMonth() + 1 < +month && +month <= 12);
   }
 };
 

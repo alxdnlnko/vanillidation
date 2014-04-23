@@ -13,6 +13,7 @@ class Vanillidation
       errorClass: 'has-error'
       classToParent: false
       errorListClass: 'errorlist'
+      showFormErrors: true
       conditional: {}
       dependencies: {}
 
@@ -39,6 +40,9 @@ class Vanillidation
       return false
 
   showFormErrors: () =>
+    if not @settings.showFormErrors
+      return
+
     error = @errors['__form__']
     if error
       created = false
