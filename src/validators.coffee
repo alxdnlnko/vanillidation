@@ -6,9 +6,11 @@ module.exports = fn =
       elem.value? and elem.value != ''
 
   regex: (elem, expr) ->
+    return true if not elem.value? or elem.value == ''
     return expr.test elem.value
 
   email: (elem) ->
+    return true if not elem.value? or elem.value == ''
     return fn.regex elem, /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 
   minLength: (elem, len) ->
@@ -18,9 +20,11 @@ module.exports = fn =
     elem.value? and elem.value.length >= len
 
   digits: (elem) ->
+    return true if not elem.value? or elem.value == ''
     return fn.regex elem, /^\d+$/
 
   isASCII: (elem) ->
+    return true if not elem.value? or elem.value == ''
     return /^[\x00-\x7F]*$/.test elem.value
 
   creditCard: (elem, typeElem) ->
