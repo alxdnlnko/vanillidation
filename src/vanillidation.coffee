@@ -24,7 +24,7 @@ class Vanillidation
 
     @bindValidationEvents name, elem, @validateField for name, elem of @fields
 
-    @form.setAttribute 'novalidate', 'novalidate'
+    @form.setAttribute 'novalidate', 'novalidate'  # disable html5 validation
     @form.addEventListener 'submit', @validateForm
 
   getFields: () =>
@@ -71,19 +71,22 @@ class Vanillidation
     rules = @rules?[name]
     return if not rules?
 
+    # conditional validation
     if (condition = @settings.conditional?[name])?
       if typeof condition is 'function' and not condition() or @errors[condition]
+        # condition wasn't satisfied: current elem validation not needed
         delete @errors[name] if name of @errors
         @showFieldErrors elem
         return true
 
-    delete @errors[name] if name of @errors
+    delete @errors[name] if name of @errors  # reset error
     if utils.isArray rules
       for r in rules
         if not @validators[r]?(elem)
           @errors[name] = (@messagesOR[name]?[r] ? @messages[r]) ? 'Invalid data.'
           break
     else
+      # validators with options and custom-function validators
       for r, opts of rules
         valid = if typeof opts is 'function' then opts(elem) else @validators[r]?(elem, opts)
 
@@ -132,19 +135,12 @@ class Vanillidation
     elem.addEventListener 'keyup', conditionalValidation
     elem.addEventListener 'change', conditionalValidation
 
+    # dependent validation
     if name of @settings.dependencies
       for dep in @settings.dependencies[name]
         depElem = @fields[dep]
         depElem.addEventListener 'change', ->
           handler elem
-
-          # if document.createEvent?
-          #   ev = document.createEvent 'HTMLEvents'
-          #   ev.initEvent 'change', false, true
-          #   elem.dispatchEvent ev
-          # else if document.createEventObject?
-          #   ev = document.createEventObject()
-          #   elem.fireEvent 'onchange', ev
 
 
 module.exports = Vanillidation
