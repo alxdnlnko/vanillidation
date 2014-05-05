@@ -110,6 +110,22 @@ new Vanillidation(form, {
 });
 ```
 
+####opts.preventSubmit
+If `opts.preventSubmit` is `true`, the form wouldn't be submitted even if it is valid. It is usefull if you are going to post data via **AJAX**. Default value: `false`.
+
+Use the `onformvalid` event with it:
+```
+var form = document.getElementById('test_form');
+new Vanillidation(form, {
+    ...
+    preventSubmit: true
+});
+
+form.addEventListener('onformvalid', function(ev) {
+    // make your AJAX here
+});
+```
+
 ####opts.conditional
 `opts.conditional` is an object where you can define conditions must be satisfied before validating a specified field.
 ```
@@ -123,7 +139,7 @@ new Vanillidation(form, {
 });
 ```
 
-####opts.depndencies
+####opts.dependencies
 `opts.dependencies` is an object where you can define dependencies between the fields. Dependent fields would be revalidated every time the specified field changes.
 ```
 new Vanillidation(form, {

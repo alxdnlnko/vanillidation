@@ -27,7 +27,7 @@
             </div>
 
             <div class="form-row">
-                <label for="id_heard_from">Credit Card Type</label>
+                <label for="id_heard_from">Heard from</label>
                 <select name="heard_from" id="id_heard_from">
                     <option value="">Select a value</option>
                     <option value="1">Twitter</option>
@@ -37,7 +37,7 @@
             </div>
 
             <div class="form-row">
-                <label for="id_cc_type">Heard from</label>
+                <label for="id_cc_type">Credit Card Type</label>
                 <select name="cc_type" id="id_cc_type">
                     <option value="visa">Visa</option>
                     <option value="mastercard">Master Card</option>
@@ -68,7 +68,8 @@
 
         <script src="vanillidation.js"></script>
         <script>
-            var v = new Vanillidation(document.getElementById('test_form'), {
+            var form = document.getElementById('test_form');
+            var v = new Vanillidation(form, {
                 rules: {
                     first_name: {
                         required: true,
@@ -115,7 +116,11 @@
                 },
                 dependencies: {
                     credit_card: ['cc_type']
-                }
+                },
+                preventSubmit: true
+            });
+            form.addEventListener('onformvalid', function(ev) {
+                alert('Form is valid!');
             });
         </script>
     </body>

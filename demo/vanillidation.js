@@ -62,6 +62,20 @@ module.exports = {
       }
     }
     return target;
+  },
+  fireEvent: function(elem, eventName) {
+    var ev;
+    if ((elem == null) || (eventName == null)) {
+      return;
+    }
+    if (document.createEvent != null) {
+      ev = document.createEvent('HTMLEvents');
+      ev.initEvent(eventName, false, true);
+      return elem.dispatchEvent(ev);
+    } else if (document.createEventObject != null) {
+      ev = document.createEventObject();
+      return elem.fireEvent(eventName, ev);
+    }
   }
 };
 
@@ -78,9 +92,15 @@ module.exports = fn = {
     }
   },
   regex: function(elem, expr) {
+    if ((elem.value == null) || elem.value === '') {
+      return true;
+    }
     return expr.test(elem.value);
   },
   email: function(elem) {
+    if ((elem.value == null) || elem.value === '') {
+      return true;
+    }
     return fn.regex(elem, /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
   },
   minLength: function(elem, len) {
@@ -90,9 +110,15 @@ module.exports = fn = {
     return (elem.value != null) && elem.value.length >= len;
   },
   digits: function(elem) {
+    if ((elem.value == null) || elem.value === '') {
+      return true;
+    }
     return fn.regex(elem, /^\d+$/);
   },
   isASCII: function(elem) {
+    if ((elem.value == null) || elem.value === '') {
+      return true;
+    }
     return /^[\x00-\x7F]*$/.test(elem.value);
   },
   creditCard: function(elem, typeElem) {
@@ -172,6 +198,8 @@ Vanillidation = (function() {
       errorClass: 'has-error',
       classToParent: false,
       errorListClass: 'errorlist',
+      showFormErrors: true,
+      preventSubmit: false,
       conditional: {},
       dependencies: {}
     };
@@ -210,11 +238,21 @@ Vanillidation = (function() {
       this.showFormErrors();
       ev.preventDefault();
       return false;
+    } else {
+      this.showFormErrors();
+      utils.fireEvent(this.form, 'onformvalid');
+      if (this.settings.preventSubmit) {
+        ev.preventDefault();
+        return false;
+      }
     }
   };
 
   Vanillidation.prototype.showFormErrors = function() {
     var created, error, li, ul;
+    if (!this.settings.showFormErrors) {
+      return;
+    }
     error = this.errors['__form__'];
     if (error) {
       created = false;

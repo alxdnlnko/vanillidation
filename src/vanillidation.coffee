@@ -14,6 +14,7 @@ class Vanillidation
       classToParent: false
       errorListClass: 'errorlist'
       showFormErrors: true
+      preventSubmit: false
       conditional: {}
       dependencies: {}
 
@@ -38,6 +39,12 @@ class Vanillidation
       @showFormErrors()
       ev.preventDefault()
       return false
+    else
+      @showFormErrors()
+      utils.fireEvent @form, 'onformvalid'
+      if @settings.preventSubmit
+        ev.preventDefault()
+        return false
 
   showFormErrors: () =>
     if not @settings.showFormErrors
